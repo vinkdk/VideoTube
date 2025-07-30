@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoTube - Anmeldung und Upload</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <div class="flex items-center">
+                <span class="text-xl font-bold">VideoTube</span>
+            </div>
+            <div class="flex items-center">
+                <div class="flex border-b border-gray-200 mr-4">
+                    <button id="homeTab" class="py-2 px-4 text-blue-500 border-b-2 border-blue-500 font-medium">Startseite</button>
+                    <button id="channelsTab" class="py-2 px-4 text-gray-500 hover:text-gray-700">Kanäle</button>
+                </div>
+                <button id="loginBtn" class="p-2 mx-1 text-gray-600 hover:bg-gray-200 rounded-full">Anmelden</button>
+                <button id="uploadBtn" class="p-2 mx-1 text-gray-600 hover:bg-gray-200 rounded-full">Video Hochladen</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Channels Section -->
+    <div id="channelsContainer" class="container mx-auto px-4 py-8 hidden">
+        <h2 class="text-2xl font-bold mb-6">Top Channels</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="bg-white rounded-lg overflow-hidden shadow p-4 text-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/1e0b5557-8be5-42f2-a0d5-4a3689e65583.png" alt="First User" class="w-24 h-24 rounded-full mx-auto mb-3">
+                <h3 class="font-bold">FirstUser</h3>
+                <p class="text-sm text-gray-600">10.000.000 Follower</p>
+                <button class="mt-2 bg-red-600 text-white px-4 py-1 rounded-full text-sm">Folgen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Videos Section -->
+    <div id="videosContainer" class="container mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold mb-6">Alle Videos</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6" id="videosGrid">
+        <!-- Videos will be added dynamically here -->
+    </div>
+
+    <!-- Channel Page -->
+    <div id="channelPage" class="container mx-auto px-4 py-8 hidden">
+        <div class="bg-white rounded-lg p-6">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9d3e1599-60d3-42f6-9a32-daee4c08c3ce.png" alt="Channel Profile" class="w-32 h-32 rounded-full">
+                <div>
+                    <h2 class="text-2xl font-bold">FirstUser</h2>
+                    <p class="text-gray-600">@FirstUser • 10.000.000 Follower</p>
+                    <button class="mt-2 bg-red-600 text-white px-4 py-1 rounded-full">Folgen</button>
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-xl font-bold mb-4">Uploads</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="channelVideos">
+                    <!-- Channel videos will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Section -->
+    <div id="videoPlayerContainer" class="fixed inset-0 bg-black bg-opacity-90 z-20 hidden">
+        <div class="container mx-auto px-4 py-8">
+            <button id="closePlayerBtn" class="absolute top-4 right-4 text-white text-2xl">×</button>
+            <video id="mainVideoPlayer" controls class="w-full h-screen">
+                <source src="" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <!-- Anmeldung Modal -->
+    <div id="loginModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-lg font-bold mb-4">Anmelden</h2>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">E-Mail</label>
+                    <input type="email" id="email" required class="mt-1 block w-full border border-gray-300 rounded-md p-2" placeholder="E-Mail eingeben">
+                </div>
+                <div class="mb-4">
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Telefonnummer</label>
+                    <input type="tel" id="phone" required class="mt-1 block w-full border border-gray-300 rounded-md p-2" placeholder="Telefonnummer eingeben">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="closeLoginModal" class="mr-2 text-gray-600">Abbrechen</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Anmelden</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Video Upload Modal -->
+    <div id="uploadModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-lg font-bold mb-4">Video Hochladen</h2>
+            <form id="uploadForm">
+                <div class="mb-4">
+                    <label for="videoTitle" class="block text-sm font-medium text-gray-700">Videotitel</label>
+                    <input type="text" id="videoTitle" required class="mt-1 block w-full border border-gray-300 rounded-md p-2" placeholder="Titel eingeben">
+                </div>
+                <div class="mb-4">
+                    <label for="videoFile" class="block text-sm font-medium text-gray-700">Video Datei</label>
+                    <input type="file" id="videoFile" accept="video/*" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="closeUploadModal" class="mr-2 text-gray-600">Abbrechen</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Hochladen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal Steuerung
+        const loginModal = document.getElementById('loginModal');
+        const uploadModal = document.getElementById('uploadModal');
+
+        document.getElementById('loginBtn').onclick = () => {
+            loginModal.classList.remove('hidden');
+        };
+
+        document.getElementById('uploadBtn').onclick = () => {
+            uploadModal.classList.remove('hidden');
+        };
+
+        document.getElementById('closeLoginModal').onclick = () => {
+            loginModal.classList.add('hidden');
+        };
+
+        document.getElementById('closeUploadModal').onclick = () => {
+            uploadModal.classList.add('hidden');
+        };
+
+        // Formularverarbeitung
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            
+            // Store user data in localStorage
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userPhone', phone);
+
+            // Create user account and channel for everyone
+            const username = email.split('@')[0];
+            localStorage.setItem('username', username);
+            
+            const userChannel = {
+                name: username,
+                followers: 0,
+                avatar: `https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/16bfdae6-ac9c-4207-bbe2-ee6d6a302984.png).toUpperCase()}`,
+                videos: []
+            };
+            
+            const channels = JSON.parse(localStorage.getItem('channels')) || [];
+            if (!channels.some(c => c.name === username)) {
+                channels.push(userChannel);
+                localStorage.setItem('channels', JSON.stringify(channels));
+            }
+            
+            // Add to channels list
+            const channels = JSON.parse(localStorage.getItem('channels')) || [];
+            if (!channels.some(c => c.name === username)) {
+                channels.push(userChannel);
+                localStorage.setItem('channels', JSON.stringify(channels));
+            }
+            
+            // Show upload button and pages
+            document.getElementById('uploadBtn').classList.remove('hidden');
+            document.getElementById('videosContainer').classList.remove('hidden');
+            updateChannelsList();
+            loginModal.classList.add('hidden');
+        };
+
+        // Update channels list display
+        function updateChannelsList() {
+            const channels = JSON.parse(localStorage.getItem('channels')) || [];
+            const container = document.getElementById('channelsContainer');
+            
+            if (channels.length > 0) {
+                container.classList.remove('hidden');
+                const channelsHTML = channels.map(channel => `
+                    <div class="bg-white rounded-lg overflow-hidden shadow p-4 text-center channel-item" 
+                         data-channel="${channel.name}">
+                        <img src="${channel.avatar}" alt="${channel.name}" class="w-24 h-24 rounded-full mx-auto mb-3">
+                        <h3 class="font-bold">${channel.name}</h3>
+                        <p class="text-sm text-gray-600">${channel.followers} Follower</p>
+                        <button class="mt-2 bg-red-600 text-white px-4 py-1 rounded-full text-sm follow-btn">Folgen</button>
+                    </div>
+                `).join('');
+                container.querySelector('div.grid').innerHTML = channelsHTML;
+            }
+        }
+
+        // Load channels on page load
+        document.addEventListener('DOMContentLoaded', updateChannelsList);
+
+        document.getElementById('uploadForm').onsubmit = (e) => {
+            e.preventDefault();
+            const title = document.getElementById('videoTitle').value;
+            const file = document.getElementById('videoFile').files[0];
+            const email = localStorage.getItem('userEmail');
+            
+            // Create video preview (simulated)
+            const videoUrl = URL.createObjectURL(file);
+            
+            // Store video to user's own channel
+            const channels = JSON.parse(localStorage.getItem('channels')) || [];
+            const username = localStorage.getItem('username');
+            const targetChannel = channels.find(c => c.name === username);
+            
+            if (targetChannel) {
+                targetChannel.videos.push({
+                    title,
+                    url: videoUrl,
+                    views: 0,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('channels', JSON.stringify(channels));
+                updateChannelsList();
+            }
+            
+            // Add video to display
+            const videoHTML = `
+                <div class="bg-white rounded-lg overflow-hidden shadow video-item cursor-pointer hover:shadow-lg" 
+                     data-url="${videoUrl}" 
+                     data-title="${title}"
+                     data-channel="FirstUser">
+                    <div class="relative pb-[56.25%]">
+                        <video class="absolute h-full w-full object-cover">
+                            <source src="${videoUrl}" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm">${title}</h3>
+                        <p class="text-sm text-gray-600">Uploaded by: ${localStorage.getItem('username')}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('videosContainer').insertAdjacentHTML('afterbegin', videoHTML);
+            uploadModal.classList.add('hidden');
+            
+            // Add click event to new video
+            document.querySelector('.video-item').addEventListener('click', function() {
+                // Show channel page
+                const channelName = this.dataset.channel;
+                    document.getElementById('channelsContainer').classList.add('hidden');
+                    document.getElementById('videosContainer').classList.add('hidden');
+                    document.getElementById('channelPage').classList.remove('hidden');
+                    
+                    // Show channel videos
+                    const channels = JSON.parse(localStorage.getItem('channels')) || [];
+                    const channel = channels.find(c => c.name === "FirstUser");
+                    const videosHTML = channel.videos.map(video => `
+                        <div class="video-item cursor-pointer">
+                            <video controls class="w-full h-40 rounded-lg">
+                                <source src="${video.url}" type="video/mp4">
+                            </video>
+                            <h4 class="mt-2 font-medium">${video.title}</h4>
+                        </div>
+                    `).join('');
+                    document.getElementById('channelVideos').innerHTML = videosHTML;
+                } else {
+                    document.getElementById('mainVideoPlayer').src = this.dataset.url;
+                    document.getElementById('videoPlayerContainer').classList.remove('hidden');
+                }
+            });
+        };
+
+        // Handle video player
+        document.getElementById('closePlayerBtn').addEventListener('click', function() {
+            document.getElementById('mainVideoPlayer').pause();
+            document.getElementById('videoPlayerContainer').classList.add('hidden');
+        });
+
+        // Handle tabs
+        document.getElementById('homeTab').addEventListener('click', function() {
+            document.getElementById('videosContainer').classList.remove('hidden');
+            document.getElementById('channelsContainer').classList.add('hidden');
+            this.classList.add('text-blue-500', 'border-blue-500');
+            document.getElementById('channelsTab').classList.remove('text-blue-500', 'border-blue-500');
+        });
+
+        document.getElementById('channelsTab').addEventListener('click', function() {
+            document.getElementById('channelsContainer').classList.remove('hidden');
+            document.getElementById('videosContainer').classList.add('hidden');
+            this.classList.add('text-blue-500', 'border-blue-500');
+            document.getElementById('homeTab').classList.remove('text-blue-500', 'border-blue-500');
+        });
+
+        // Show videos by default
+        document.getElementById('videosContainer').classList.remove('hidden');
+    </script>
+</body>
+</html>
